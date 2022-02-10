@@ -19,7 +19,7 @@ const pool = new Pool({
 const getUserWithEmail = function(email) {
 
   const queryString = `
-    SELECT * FROM USERS
+    SELECT * FROM users
     WHERE email = $1;
   `;
   
@@ -27,7 +27,7 @@ const getUserWithEmail = function(email) {
     .query(queryString, [email])
     .then(result => {
       if (result.rows.length >=1) {
-        return result.rows[0]
+        return result.rows[0];
       }
       return null;
     })
@@ -47,7 +47,7 @@ exports.getUserWithEmail = getUserWithEmail;
 const getUserWithId = function(id) {
 
   const queryString = `
-  SELECT * FROM USERS
+  SELECT * FROM users
   WHERE id = $1;
   `;
 
@@ -55,7 +55,7 @@ const getUserWithId = function(id) {
     .query(queryString, [id])
     .then(result => {
       if (result.rows.length >=1) {
-        return result.rows[0]
+        return result.rows[0];
       }
       return null;
     })
@@ -75,8 +75,8 @@ exports.getUserWithId = getUserWithId;
 const addUser =  function(user) {
 
   const queryString = `
-    INSERT INTO USERS (name, email, password)
-    VALUES($1, $2, $3)
+    INSERT INTO users (name, email, password)
+    VALUES ($1, $2, $3)
     RETURNING *;
   `;
 
@@ -86,7 +86,7 @@ const addUser =  function(user) {
     .query(queryString, values)
     .then(result => {
       if (result.rows.length >=1) {
-        return result.rows[0]
+        return result.rows[0];
       }
       return null;
     })
@@ -94,13 +94,6 @@ const addUser =  function(user) {
       console.log(err.message);
       return null;
     });
-
-
-
-  // const userId = Object.keys(users).length + 1;
-  // user.id = userId;
-  // users[userId] = user;
-  // return Promise.resolve(user);
 }
 exports.addUser = addUser;
 
@@ -112,7 +105,27 @@ exports.addUser = addUser;
  * @return {Promise<[{}]>} A promise to the reservations.
  */
 const getAllReservations = function(guest_id, limit = 10) {
-  return getAllProperties(null, 2);
+
+  const queryString = `
+  SELECT properties.*, reservations.start_date, reservations.end_date 
+  FROM reservations
+  JOIN properties ON reservations.property_id = properties.id
+  WHERE reservations.guest_id = $1
+  LIMIT $2;
+  `;
+
+  return pool
+    .query(queryString, [guest_id, limit])
+    .then(result => {
+      if (result.rows.length >=1) {
+        return result.rows;
+      }
+      return null;
+    })
+    .catch((err) => {
+      console.log(err.message);
+      return null;
+    });
 }
 exports.getAllReservations = getAllReservations;
 
