@@ -1,6 +1,6 @@
 $(() => {
   window.propertyListing = {};
-  
+
   function createListing(property, isReservation) {
     return `
     <article class="property-listing">
@@ -23,9 +23,41 @@ $(() => {
           </footer>
         </section>
       </article>
+      ${!isReservation ? 
+        `<form id="reserve" method="POST">
+            <input type="hidden" name="propertyId" value=${property.id}>
+            <div class="start-date"><input type="date" name="start"></div>
+            <div class="end-date"><input type="date" name="end"></div>
+            <div><button type="submit">Reserve</button></div>
+        </form>` 
+        : ``}
     `
   }
 
   window.propertyListing.createListing = createListing;
 
+  // window.$signUpForm = $signUpForm;
+
+  // $signUpForm.on('submit', function(event) {
+  //   event.preventDefault();
+
+  //   const data = $(this).serialize();
+  //   signUp(data)
+  //     .then(getMyDetails)
+  //     .then((json) => {
+  //       header.update(json.user);
+  //       views_manager.show('listings');
+  //     });
+  // });
+
+
+  $('body').on('submit', '#reserve', function(evt) {
+    evt.preventDefault();
+    const data = $(this).serialize();
+    makeReservation(data)
+      .then(json => {
+        alert("Property is reserved from " + json.start_date + " to " + json.end_date);
+    });
+  });
 });
+

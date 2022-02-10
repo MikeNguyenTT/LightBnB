@@ -182,7 +182,7 @@ const getAllProperties = (options, limit = 10) => {
   queryString += `
     LIMIT $${queryParams.length};
   `;
-  console.log(queryString, queryParams);
+
   return pool
     .query(queryString, queryParams)
     .then((result) => result.rows)
@@ -239,3 +239,32 @@ const addProperty = function(property) {
     });
 }
 exports.addProperty = addProperty;
+
+const addReservation = function(reservation) {
+  
+  const queryString = `
+    INSERT INTO reservations (start_date, end_date, property_id, guest_id)
+    VALUES ($1, $2, $3, $4)
+    RETURNING *;
+  `;
+  const queryParams = [
+    reservation.start_date, 
+    reservation.end_date, 
+    reservation.property_id, 
+    reservation.guest_id, 
+  ];
+
+  return pool
+    .query(queryString, queryParams)
+    .then(result => {
+      if (result.rows.length >= 1) {
+        return result.rows[0];
+      }
+      return null;
+    })
+    .catch((err) => {
+      console.log(err.message);
+      return null;
+    });
+}
+exports.addReservation = addReservation;
