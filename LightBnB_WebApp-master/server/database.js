@@ -140,15 +140,18 @@ exports.getAllReservations = getAllReservations;
 
 const getAllProperties = (options, limit = 10) => {
   const queryParams = [];
+
+  // WHERE clause here is dummy, to make sure all next "AND" clause work syntactically
   let queryString = `
     SELECT properties.*, avg(property_reviews.rating) as average_rating
     FROM properties
     JOIN property_reviews ON properties.id = property_id 
+    WHERE 1 = 1
   `;
 
   if (options.city) {
     queryParams.push(`%${options.city}%`);
-    queryString += `WHERE city LIKE $${queryParams.length} `;
+    queryString += `AND city LIKE $${queryParams.length} `;
   }
 
   if (options.owner_id) {
@@ -179,7 +182,7 @@ const getAllProperties = (options, limit = 10) => {
   queryString += `
     LIMIT $${queryParams.length};
   `;
-
+  console.log(queryString, queryParams);
   return pool
     .query(queryString, queryParams)
     .then((result) => result.rows)
