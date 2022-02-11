@@ -1,5 +1,6 @@
 const properties = require('./json/properties.json');
 const users = require('./json/users.json');
+const db = require('./db')
 const { Pool } = require('pg');
 
 const pool = new Pool({
@@ -23,19 +24,30 @@ const getUserWithEmail = function(email) {
     WHERE email = $1;
   `;
   
-  return pool
-    .query(queryString, [email])
-    .then(result => {
-      if (result.rows.length >=1) {
-        return result.rows[0];
-      }
-      return null;
-    })
-    .catch((err) => {
-      console.log(err.message);
-      return null;
-    });
+  return db.query(queryString, [email], true);
+    
 }
+
+// const getUserWithEmail = function(email) {
+
+//   const queryString = `
+//     SELECT * FROM users
+//     WHERE email = $1;
+//   `;
+  
+//   return pool
+//     .query(queryString, [email])
+//     .then(result => {
+//       if (result.rows.length >=1) {
+//         return result.rows[0];
+//       }
+//       return null;
+//     })
+//     .catch((err) => {
+//       console.log(err.message);
+//       return null;
+//     });
+// }
 
 exports.getUserWithEmail = getUserWithEmail;
 
@@ -51,18 +63,7 @@ const getUserWithId = function(id) {
   WHERE id = $1;
   `;
 
-  return pool
-    .query(queryString, [id])
-    .then(result => {
-      if (result.rows.length >=1) {
-        return result.rows[0];
-      }
-      return null;
-    })
-    .catch((err) => {
-      console.log(err.message);
-      return null;
-    });
+  return db.query(queryString, [id], true);
 }
 exports.getUserWithId = getUserWithId;
 
@@ -82,18 +83,7 @@ const addUser =  function(user) {
 
   const values = [user.name, user.email, user.password];
 
-  return pool
-    .query(queryString, values)
-    .then(result => {
-      if (result.rows.length >=1) {
-        return result.rows[0];
-      }
-      return null;
-    })
-    .catch((err) => {
-      console.log(err.message);
-      return null;
-    });
+  return db.query(queryString, values, true);
 }
 exports.addUser = addUser;
 
@@ -114,18 +104,7 @@ const getAllReservations = function(guest_id, limit = 10) {
   LIMIT $2;
   `;
 
-  return pool
-    .query(queryString, [guest_id, limit])
-    .then(result => {
-      if (result.rows.length >=1) {
-        return result.rows;
-      }
-      return null;
-    })
-    .catch((err) => {
-      console.log(err.message);
-      return null;
-    });
+  return db.query(queryString, [guest_id, limit]);
 }
 exports.getAllReservations = getAllReservations;
 
@@ -183,12 +162,7 @@ const getAllProperties = (options, limit = 10) => {
     LIMIT $${queryParams.length};
   `;
 
-  return pool
-    .query(queryString, queryParams)
-    .then((result) => result.rows)
-    .catch((err) => {
-      console.log(err.message);
-    });
+  return db.query(queryString, queryParams);
 };
 
 exports.getAllProperties = getAllProperties;
@@ -225,18 +199,7 @@ const addProperty = function(property) {
     property.post_code
   ];
 
-  return pool
-    .query(queryString, queryParams)
-    .then(result => {
-      if (result.rows.length >= 1) {
-        return result.rows[0];
-      }
-      return null;
-    })
-    .catch((err) => {
-      console.log(err.message);
-      return null;
-    });
+  return db.query(queryString, queryParams, true);
 }
 exports.addProperty = addProperty;
 
@@ -254,17 +217,6 @@ const addReservation = function(reservation) {
     reservation.guest_id, 
   ];
 
-  return pool
-    .query(queryString, queryParams)
-    .then(result => {
-      if (result.rows.length >= 1) {
-        return result.rows[0];
-      }
-      return null;
-    })
-    .catch((err) => {
-      console.log(err.message);
-      return null;
-    });
+  return db.query(queryString, queryParams, true);
 }
 exports.addReservation = addReservation;
